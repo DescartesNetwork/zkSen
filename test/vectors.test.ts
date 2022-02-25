@@ -1,5 +1,5 @@
-import { Point } from '@noble/ed25519'
-import { assert } from 'chai'
+import { assert, expect } from 'chai'
+import { Point } from '../lib/point'
 import { PointVector, ScalarVector } from '../lib/vectors'
 
 const SCALAR_VECTOR = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n]
@@ -14,23 +14,25 @@ describe('scalar vectors', function () {
   })
 
   it('left', () => {
-    const vL = SCALAR_VECTOR.slice(0, SCALAR_VECTOR.length / 2)
-    assert.deepEqual(v.left.vector, vL)
+    const vL = new ScalarVector(
+      SCALAR_VECTOR.slice(0, SCALAR_VECTOR.length / 2),
+    )
+    expect(v.left.equals(vL)).true
   })
 
   it('right', () => {
-    const vR = SCALAR_VECTOR.slice(SCALAR_VECTOR.length / 2)
-    assert.deepEqual(v.right.vector, vR)
+    const vR = new ScalarVector(SCALAR_VECTOR.slice(SCALAR_VECTOR.length / 2))
+    expect(v.right.equals(vR)).true
   })
 
   it('add scalar vector', () => {
-    const doubleV = SCALAR_VECTOR.map((e) => e * 2n)
-    assert.deepEqual(v.addScalarVector(v).vector, doubleV)
+    const doubleV = new ScalarVector(SCALAR_VECTOR.map((e) => e * 2n))
+    expect(v.addScalarVector(v).equals(doubleV)).true
   })
 
   it('mul scalar', () => {
-    const doubleV = SCALAR_VECTOR.map((e) => e * 2n)
-    assert.deepEqual(v.mulScalar(2n).vector, doubleV)
+    const doubleV = new ScalarVector(SCALAR_VECTOR.map((e) => e * 2n))
+    expect(v.mulScalar(2n).equals(doubleV)).true
   })
 
   it('mul point vector', () => {
@@ -38,7 +40,7 @@ describe('scalar vectors', function () {
       SCALAR_VECTOR.map((e) => e ** 2n).reduce((m, n) => m + n),
     )
     const pointVector = new PointVector(POINT_VECTOR)
-    assert.deepEqual(v.mulPointVector(pointVector), point)
+    expect(v.mulPointVector(pointVector).equals(point)).true
   })
 })
 
@@ -52,22 +54,22 @@ describe('point vectors', function () {
 
   it('left', () => {
     const vL = new PointVector(POINT_VECTOR.slice(0, POINT_VECTOR.length / 2))
-    assert.deepEqual(v.left.vector, vL.vector)
+    expect(v.left.equals(vL)).true
   })
 
   it('right', () => {
     const vR = new PointVector(POINT_VECTOR.slice(POINT_VECTOR.length / 2))
-    assert.deepEqual(v.right.vector, vR.vector)
+    expect(v.right.equals(vR)).true
   })
 
   it('add point vector', () => {
-    const doubleVector = v.vector.map((e) => e.multiply(2n))
-    assert.deepEqual(v.addPointVector(v).vector, doubleVector)
+    const doubleVector = new PointVector(v.vector.map((e) => e.multiply(2n)))
+    expect(v.addPointVector(v).equals(doubleVector)).true
   })
 
   it('mul scalar', () => {
-    const doubleVector = v.vector.map((e) => e.multiply(2n))
-    assert.deepEqual(v.mulScalar(2n).vector, doubleVector)
+    const doubleVector = new PointVector(v.vector.map((e) => e.multiply(2n)))
+    expect(v.mulScalar(2n).equals(doubleVector)).true
   })
 
   it('mul scalar vector', () => {
@@ -75,6 +77,6 @@ describe('point vectors', function () {
       SCALAR_VECTOR.map((e) => e ** 2n).reduce((m, n) => m + n),
     )
     const scalarVector = new ScalarVector(SCALAR_VECTOR)
-    assert.deepEqual(v.mulScalarVector(scalarVector), point)
+    expect(v.mulScalarVector(scalarVector).equals(point)).true
   })
 })

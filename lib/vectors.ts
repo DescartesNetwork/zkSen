@@ -1,4 +1,4 @@
-import { Point } from '@noble/ed25519'
+import { Point } from './point'
 import { mod } from './utils'
 
 /**
@@ -8,7 +8,7 @@ export abstract class CoreVector<T> {
   private _vector: Array<T>
 
   constructor(vector: Array<T>) {
-    this._vector = vector
+    this._vector = [...vector]
   }
 
   private halfLength = () => {
@@ -19,15 +19,18 @@ export abstract class CoreVector<T> {
     return this.vector.length / 2
   }
 
-  protected compareLength = (other: any) => {
-    if (this.vector.length !== other.vector.length)
+  protected compareLength = (other: any, strict = true) => {
+    if (this.vector.length !== other.vector.length) {
+      if (!strict) return false
       throw new Error(
         `The length of 2 vectors don't equal: ${this.vector.length} and ${other.vector.length}`,
       )
+    }
     return this.vector.length
   }
 
   protected abstract wrap(v: Array<T>): this
+  protected abstract equals(v: this): boolean
 
   get vector() {
     return this._vector
@@ -53,6 +56,15 @@ export class ScalarVector extends CoreVector<bigint> {
   }
 
   wrap = (v: Array<bigint>) => new ScalarVector(v) as this
+
+  equals = (other: ScalarVector) => {
+    const length = this.compareLength(other, false)
+    if (!length) return false
+    for (let i = 0; i < length; i++) {
+      if (this.vector[i] !== other.vector[i]) return false
+    }
+    return true
+  }
 
   addScalarVector = (other: ScalarVector) => {
     this.compareLength(other)
@@ -89,6 +101,15 @@ export class PointVector extends CoreVector<Point> {
   }
 
   wrap = (v: Array<Point>) => new PointVector(v) as this
+
+  equals = (other: PointVector) => {
+    const length = this.compareLength(other, false)
+    if (!length) return false
+    for (let i = 0; i < length; i++) {
+      if (!this.vector[i].equals(other.vector[i])) return false
+    }
+    return true
+  }
 
   addPointVector = (other: PointVector) => {
     this.compareLength(other)
