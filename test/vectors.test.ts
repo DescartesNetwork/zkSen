@@ -10,7 +10,7 @@ describe('scalar vectors', function () {
 
   it('new', () => {
     v = new ScalarVector(SCALAR_VECTOR)
-    assert.deepEqual(SCALAR_VECTOR, v.vector)
+    assert.deepEqual(SCALAR_VECTOR, v.value)
   })
 
   it('left', () => {
@@ -49,7 +49,7 @@ describe('point vectors', function () {
 
   it('new', async () => {
     v = new PointVector(POINT_VECTOR)
-    assert.deepEqual(POINT_VECTOR, v.vector)
+    assert.deepEqual(POINT_VECTOR, v.value)
   })
 
   it('left', () => {
@@ -63,12 +63,12 @@ describe('point vectors', function () {
   })
 
   it('add point vector', () => {
-    const doubleVector = new PointVector(v.vector.map((e) => e.multiply(2n)))
+    const doubleVector = new PointVector(v.value.map((e) => e.multiply(2n)))
     expect(v.addPointVector(v).equals(doubleVector)).true
   })
 
   it('mul scalar', () => {
-    const doubleVector = new PointVector(v.vector.map((e) => e.multiply(2n)))
+    const doubleVector = new PointVector(v.value.map((e) => e.multiply(2n)))
     expect(v.mulScalar(2n).equals(doubleVector)).true
   })
 

@@ -27,7 +27,3 @@ export const padding = (bin: string, bits: number = 64) => {
   while (re.length < bits) re = '0' + re
   return re
 }
-
-export const generatorVector = (length: number = 64) => {
-  return [...Array(length).keys()].map((_) => randPoint())
-}
