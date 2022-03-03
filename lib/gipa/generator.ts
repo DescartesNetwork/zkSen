@@ -75,15 +75,13 @@ export class Machine {
     // alpha: [α^2, α^4, α^8, α^16, α^32, α^64, ...]
     const _alpha = randScalar()
     const alpha: bigint[] = range(l).map((i) => mod(_alpha ** (2n ** (i + 1n))))
-    // g: [G * α^2i](0..l)
-    // ga:  G * α
+    // g: [G, G*α^2, G*α^4, G*α^6, ...]
     const G = randPoint()
     const g = new PointVector(r.map((i) => G.multiply(mod(_alpha ** (2n * i)))))
     // beta: [β^2, β^4, β^8, β^16, β^32, β^64, ...]
     const _beta = randScalar()
     const beta: bigint[] = range(l).map((i) => mod(_beta ** (2n ** (i + 1n))))
-    // h: [H * β^2i](0..l)
-    // hb:  H * β
+    // h: [H, H*β^2, H*β^4, H*β^6, ...]
     const H = randPoint()
     const h = new PointVector(r.map((i) => H.multiply(mod(_beta ** (2n * i)))))
     return { g, h, alpha, beta }
