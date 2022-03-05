@@ -34,6 +34,12 @@ export class TwistedElGamal {
     return dC.equals(_dC)
   }
 
+  identical = (other: TwistedElGamal) => {
+    return (
+      this.C.equals(other.C) && this.D.equals(other.D) && this.P.equals(other.P)
+    )
+  }
+
   add = (other: TwistedElGamal) => {
     this.mine(other)
     const clone = this.clone()
@@ -60,6 +66,15 @@ export class TwistedElGamal {
     clone.C = this.C.multiply(scalar)
     // Dx = Pzx
     clone.D = this.D.multiply(scalar)
+    return clone
+  }
+
+  divide = (scalar: bigint) => {
+    const clone = this.clone()
+    // C * x^-1 = Gm * x-1 + Hz * x^-1
+    clone.C = this.C.divide(scalar)
+    // D * x^-1 = Pz * x^-1
+    clone.D = this.D.divide(scalar)
     return clone
   }
 }

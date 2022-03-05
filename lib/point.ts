@@ -1,5 +1,6 @@
 import { CURVE, Point as _Point, utils } from '@noble/ed25519'
 import { hash } from 'tweetnacl'
+import { invert } from './utils'
 
 export type Hex = Uint8Array | string
 export type PrivKey = Hex | bigint | number
@@ -35,8 +36,12 @@ export class Point {
   negate = () => Point.wrap(this._point.negate())
   add = (other: Point) => Point.wrap(this._point.add(other._point))
   subtract = (other: Point) => Point.wrap(this._point.subtract(other._point))
-  multiply = (scalar: number | bigint) => {
+  multiply = (scalar: bigint) => {
     if (!scalar) return Point.ZERO
     return Point.wrap(this._point.multiply(scalar))
+  }
+  divide = (scalar: bigint) => {
+    if (!scalar) throw new Error('Cannot be divided by zero')
+    return Point.wrap(this._point.multiply(invert(scalar)))
   }
 }

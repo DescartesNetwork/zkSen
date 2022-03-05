@@ -45,11 +45,11 @@ export class Mint {
     this.supply = new TwistedElGamal(0n, this.s)
   }
 
-  findAccount = (accountPublicKey: PublicKey) => {
+  getAccount = (accountPublicKey: PublicKey) => {
     const index = this.accounts.findIndex(
       ({ publicKey }) => publicKey.toBase58() === accountPublicKey.toBase58(),
     )
-    if (index === -1) return undefined
+    if (index === -1) throw new Error('Account is not initialized yet')
     return this.accounts[index]
   }
 
@@ -58,25 +58,25 @@ export class Mint {
     return this.accounts[this.accounts.length - 1]
   }
 
-  mintTo = (accountPublicKey: PublicKey, amount: bigint) => {
-    const account = this.findAccount(accountPublicKey)
-    if (!account) throw new Error('The account does not exist')
-    this.supply = this.supply.add(new TwistedElGamal(amount, this.s))
-    account.amount = account.amount.add(new TwistedElGamal(amount, account.s))
+  mintTo = (
+    accountPublicKey: PublicKey,
+    srcAmount: TwistedElGamal,
+    dstAmount: TwistedElGamal,
+  ) => {
+    const account = this.getAccount(accountPublicKey)
+    this.supply = this.supply.add(srcAmount)
+    account.amount = account.amount.add(dstAmount)
   }
 
   transfer = (
-    senderPublickey: PublicKey,
-    receiverPublickey: PublicKey,
-    amount: bigint,
+    srcPublickey: PublicKey,
+    dstPublickey: PublicKey,
+    srcAmount: TwistedElGamal,
+    dstAmount: TwistedElGamal,
   ) => {
-    const sender = this.findAccount(senderPublickey)
-    const receiver = this.findAccount(receiverPublickey)
-    if (!sender) throw new Error('The sender does not exist')
-    if (!receiver) throw new Error('The receiver does not exist')
-    sender.amount = sender.amount.subtract(new TwistedElGamal(amount, sender.s))
-    receiver.amount = receiver.amount.add(
-      new TwistedElGamal(amount, receiver.s),
-    )
+    const src = this.getAccount(srcPublickey)
+    const dst = this.getAccount(dstPublickey)
+    src.amount = src.amount.subtract(srcAmount)
+    dst.amount = dst.amount.add(dstAmount)
   }
 }
