@@ -32,23 +32,23 @@ export class Ledger {
   }
 
   mintTo = (
-    receiverPublickey: PublicKey,
+    dstPublickey: PublicKey,
     amount: bigint,
     mintPublicKey: PublicKey,
   ) => {
     const mint = this.findMint(mintPublicKey)
     if (!mint) throw new Error('The mint does not exist')
-    mint.mintTo(receiverPublickey, amount)
+    mint.mintTo(dstPublickey, amount)
   }
 
   transfer = (
-    senderPublickey: PublicKey,
-    receiverPublickey: PublicKey,
+    srcPublickey: PublicKey,
+    dstPublickey: PublicKey,
     amount: bigint,
     mintPublicKey: PublicKey,
   ) => {
     const mint = this.findMint(mintPublicKey)
     if (!mint) throw new Error('The mint does not exist')
-    mint.transfer(senderPublickey, receiverPublickey, amount)
+    mint.transfer(srcPublickey, dstPublickey, amount)
   }
 }
