@@ -41,6 +41,21 @@ describe('ledger core', function () {
     expect(ok).true
   })
 
+  it('burn', () => {
+    const mint = ledger.getMint(mintPublicKey)
+    const account = ledger.getAccount(srcPublicKey)
+    ledger.burn(
+      new TwistedElGamal(amount, account.s),
+      new TwistedElGamal(amount, mint.s),
+      srcPublicKey,
+      mintPublicKey,
+    )
+    const ok =
+      account.amount.verify(supply - amount, account.s) &&
+      mint.supply.verify(supply - amount, mint.s)
+    expect(ok).true
+  })
+
   it('transfer', () => {
     const srcAccount = ledger.getAccount(srcPublicKey)
     const dstAccount = ledger.getAccount(dstPublicKey)
@@ -51,8 +66,9 @@ describe('ledger core', function () {
       dstPublicKey,
       mintPublicKey,
     )
+    // Due to burn, we need to subtract an amount first
     const ok =
-      srcAccount.amount.verify(supply - amount, srcAccount.s) &&
+      srcAccount.amount.verify(supply - 2n * amount, srcAccount.s) &&
       dstAccount.amount.verify(amount, dstAccount.s)
     expect(ok).true
   })
@@ -98,6 +114,22 @@ describe('ledger events', function () {
     expect(ok).true
   })
 
+  it('burn', () => {
+    const mint = rpc.emit<Mint>(LedgerActions.GetMint, mintPublicKey)
+    const account = rpc.emit<Account>(LedgerActions.GetAccount, srcPublicKey)
+    rpc.emit(
+      LedgerActions.Burn,
+      new TwistedElGamal(amount, account.s),
+      new TwistedElGamal(amount, mint.s),
+      srcPublicKey,
+      mintPublicKey,
+    )
+    const ok =
+      account.amount.verify(supply - amount, account.s) &&
+      mint.supply.verify(supply - amount, mint.s)
+    expect(ok).true
+  })
+
   it('transfer', () => {
     const srcAccount = rpc.emit<Account>(LedgerActions.GetAccount, srcPublicKey)
     const dstAccount = rpc.emit<Account>(LedgerActions.GetAccount, dstPublicKey)
@@ -110,7 +142,7 @@ describe('ledger events', function () {
       mintPublicKey,
     )
     const ok =
-      srcAccount.amount.verify(supply - amount, srcAccount.s) &&
+      srcAccount.amount.verify(supply - 2n * amount, srcAccount.s) &&
       dstAccount.amount.verify(amount, dstAccount.s)
     expect(ok).true
   })

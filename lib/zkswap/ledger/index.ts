@@ -11,6 +11,7 @@ export enum LedgerActions {
   InitializeMint = 'ledger/action/initializeMint',
   InitializeAccount = 'ledger/action/initializeAccount',
   MintTo = 'ledger/action/mintTo',
+  Burn = 'ledger/action/burn',
   Transfer = 'ledger/action/transfer',
 }
 
@@ -20,6 +21,7 @@ export enum LedgerEvents {
   InitializeMint = 'ledger/event/initializeMint',
   InitializeAccount = 'ledger/event/initializeAccount',
   MintTo = 'ledger/event/mintTo',
+  Burn = 'ledger/event/burn',
   Transfer = 'ledger/event/transfer',
 }
 
@@ -58,6 +60,17 @@ export class Ledger {
         mintPublicKey: PublicKey,
       ) => {
         return this.mintTo(srcAmount, dstAmount, dstPublickey, mintPublicKey)
+      },
+    )
+    this.rpc.on(
+      LedgerActions.Burn,
+      (
+        srcAmount: TwistedElGamal,
+        dstAmount: TwistedElGamal,
+        srcPublickey: PublicKey,
+        mintPublicKey: PublicKey,
+      ) => {
+        return this.burn(srcAmount, dstAmount, srcPublickey, mintPublicKey)
       },
     )
     this.rpc.on(
@@ -127,6 +140,23 @@ export class Ledger {
       srcAmount,
       dstAmount,
       dstPublickey,
+      mintPublicKey,
+    )
+  }
+
+  burn = (
+    srcAmount: TwistedElGamal,
+    dstAmount: TwistedElGamal,
+    srcPublickey: PublicKey,
+    mintPublicKey: PublicKey,
+  ) => {
+    const mint = this.getMint(mintPublicKey)
+    mint.burn(srcPublickey, srcAmount, dstAmount)
+    this.rpc.emit(
+      LedgerEvents.Burn,
+      srcAmount,
+      dstAmount,
+      srcPublickey,
       mintPublicKey,
     )
   }

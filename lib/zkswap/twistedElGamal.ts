@@ -18,14 +18,18 @@ export class TwistedElGamal {
       throw new Error('Cannot add 2 commitments from 2 different keys')
   }
 
-  clone = (): TwistedElGamal => {
+  static build = (C: Point, D: Point, P: Point): TwistedElGamal => {
     // Create an arbitrary instance
     const clone = new TwistedElGamal(randScalar(), randScalar())
     // Copy the info
-    clone.C = this.C.clone()
-    clone.D = this.D.clone()
-    clone.P = this.P.clone()
+    clone.C = C.clone()
+    clone.D = D.clone()
+    clone.P = P.clone()
     return clone
+  }
+
+  clone = (): TwistedElGamal => {
+    return TwistedElGamal.build(this.C, this.D, this.P)
   }
 
   verify = (m: bigint, s: bigint) => {
@@ -34,7 +38,7 @@ export class TwistedElGamal {
     return dC.equals(_dC)
   }
 
-  identical = (other: TwistedElGamal) => {
+  identify = (other: TwistedElGamal) => {
     return (
       this.C.equals(other.C) && this.D.equals(other.D) && this.P.equals(other.P)
     )
