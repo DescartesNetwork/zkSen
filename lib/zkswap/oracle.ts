@@ -1,9 +1,9 @@
+import { PublicKey } from '@solana/web3.js'
+import { ProductConstant, ProductConstantProof } from 'zk'
 import { RPC } from './rpc'
 import { AMM, AMMEvents } from './amm'
-import { PublicKey } from '@solana/web3.js'
 import { LedgerActions } from './ledger'
 import { Account } from './ledger/spl'
-import { Swap } from './zk'
 
 export class Oracle {
   private rpc: RPC
@@ -43,8 +43,12 @@ export class Oracle {
         srcAmountB,
         dstAmountB,
       ) => {
-        this.ra = (this.ra * gamma) / AMM.PRECISION
-        this.rb = (this.rb * AMM.PRECISION) / gamma
+        const bidAdjustmentAmount =
+          this.ra * AMM.PRECISION - ((this.ra * AMM.PRECISION) / gamma) * gamma
+        this.ra = (this.ra * AMM.PRECISION - bidAdjustmentAmount) / gamma
+        const askAdjustmentAmount =
+          this.rb * gamma - ((this.rb * gamma) / AMM.PRECISION) * AMM.PRECISION
+        this.rb = (this.rb * gamma - askAdjustmentAmount) / AMM.PRECISION
         console.log(AMMEvents.SwapAB, this.ra, this.rb)
       },
     )
@@ -61,7 +65,7 @@ export class Oracle {
     dstBPublicKey: PublicKey,
     treasuryAPublicKey: PublicKey,
     treasuryBPublicKey: PublicKey,
-  ) => {
+  ): ProductConstantProof => {
     const srcA = this.rpc.emit<Account>(LedgerActions.GetAccount, srcAPublicKey)
     const dstB = this.rpc.emit<Account>(LedgerActions.GetAccount, dstBPublicKey)
     const treasuryA = this.rpc.emit<Account>(
@@ -73,7 +77,7 @@ export class Oracle {
       treasuryBPublicKey,
     )
 
-    const proof = Swap.prove(
+    const proof = ProductConstant.prove(
       gamma,
       this.ra,
       this.rb,
@@ -83,8 +87,36 @@ export class Oracle {
       treasuryB,
     )
 
-    const ok = Swap.verify(treasuryA.amount, treasuryB.amount, proof)
-    console.log(ok)
+    return proof
+  }
+
+  swapBA = (
+    gamma: bigint,
+    srcBPublicKey: PublicKey,
+    dstAPublicKey: PublicKey,
+    treasuryBPublicKey: PublicKey,
+    treasuryAPublicKey: PublicKey,
+  ): ProductConstantProof => {
+    const srcB = this.rpc.emit<Account>(LedgerActions.GetAccount, srcBPublicKey)
+    const dstA = this.rpc.emit<Account>(LedgerActions.GetAccount, dstAPublicKey)
+    const treasuryA = this.rpc.emit<Account>(
+      LedgerActions.GetAccount,
+      treasuryAPublicKey,
+    )
+    const treasuryB = this.rpc.emit<Account>(
+      LedgerActions.GetAccount,
+      treasuryBPublicKey,
+    )
+
+    const proof = ProductConstant.prove(
+      gamma,
+      this.rb,
+      this.ra,
+      srcB.amount,
+      dstA.amount,
+      treasuryB,
+      treasuryA,
+    )
 
     return proof
   }

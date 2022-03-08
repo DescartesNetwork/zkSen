@@ -4,7 +4,12 @@ import { LedgerActions, LedgerPing } from './ledger'
 import { Account } from './ledger/spl'
 import { RPC } from './rpc'
 import { TwistedElGamal } from './twistedElgamal'
-import { Equality, EqualityProof, ScalarMultiplication } from './zk'
+import {
+  PerdesenEquality,
+  PerdesenEqualityProof,
+  ScalarMultiplication,
+} from '../zk'
+import { HybridEquality, HybridEqualityProof } from 'zk/hybridEquality'
 
 export enum AMMEvents {
   Init = 'amm/event/init',
@@ -153,16 +158,16 @@ export class AMM {
     srcAPublicKey: PublicKey,
     srcAmountA: TwistedElGamal,
     dstAmountA: TwistedElGamal,
-    equalityProofA: EqualityProof,
+    equalityProofA: PerdesenEqualityProof,
 
     srcBPublicKey: PublicKey,
     srcAmountB: TwistedElGamal,
     dstAmountB: TwistedElGamal,
-    equalityProofB: EqualityProof,
+    equalityProofB: PerdesenEqualityProof,
   ) => {
-    if (!Equality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
+    if (!PerdesenEquality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
       throw new Error('Invalid proof of amount A')
-    if (!Equality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
+    if (!PerdesenEquality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
       throw new Error('Invalid proof of amount B')
     this.rpc.emit(
       LedgerActions.Transfer,
@@ -186,16 +191,16 @@ export class AMM {
     dstAPublicKey: PublicKey,
     srcAmountA: TwistedElGamal,
     dstAmountA: TwistedElGamal,
-    equalityProofA: EqualityProof,
+    equalityProofA: PerdesenEqualityProof,
 
     dstBPublicKey: PublicKey,
     srcAmountB: TwistedElGamal,
     dstAmountB: TwistedElGamal,
-    equalityProofB: EqualityProof,
+    equalityProofB: PerdesenEqualityProof,
   ) => {
-    if (!Equality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
+    if (!PerdesenEquality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
       throw new Error('Invalid proof of amount A')
-    if (!Equality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
+    if (!PerdesenEquality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
       throw new Error('Invalid proof of amount B')
     this.rpc.emit(
       LedgerActions.Transfer,
@@ -221,17 +226,16 @@ export class AMM {
     srcPublicKey: PublicKey,
     srcAmountA: TwistedElGamal,
     dstAmountA: TwistedElGamal,
-    equalityProofA: EqualityProof,
+    equalityProofA: HybridEqualityProof,
 
     dstPublicKey: PublicKey,
     srcAmountB: TwistedElGamal,
     dstAmountB: TwistedElGamal,
-    equalityProofB: EqualityProof,
+    equalityProofB: HybridEqualityProof,
   ) => {
-    this.verifyScalarMultiplication(gamma, dstAmountA, srcAmountB)
-    if (!Equality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
+    if (!HybridEquality.verify(dstAmountA, srcAmountA, equalityProofA))
       throw new Error('Invalid proof of amount A')
-    if (!Equality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
+    if (!HybridEquality.verify(srcAmountB, dstAmountB, equalityProofB))
       throw new Error('Invalid proof of amount B')
     this.rpc.emit(
       LedgerActions.Transfer,
@@ -267,17 +271,16 @@ export class AMM {
     srcPublicKey: PublicKey,
     srcAmountB: TwistedElGamal,
     dstAmountB: TwistedElGamal,
-    equalityProofB: EqualityProof,
+    equalityProofB: HybridEqualityProof,
 
     dstPublicKey: PublicKey,
     srcAmountA: TwistedElGamal,
     dstAmountA: TwistedElGamal,
-    equalityProofA: EqualityProof,
+    equalityProofA: HybridEqualityProof,
   ) => {
-    this.verifyScalarMultiplication(gamma, dstAmountA, srcAmountB)
-    if (!Equality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
+    if (!HybridEquality.verify(dstAmountB, srcAmountB, equalityProofB))
       throw new Error('Invalid proof of amount B')
-    if (!Equality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
+    if (!HybridEquality.verify(srcAmountA, dstAmountA, equalityProofA))
       throw new Error('Invalid proof of amount A')
     this.rpc.emit(
       LedgerActions.Transfer,

@@ -5,7 +5,7 @@ import { Oracle } from '../lib/zkswap/oracle'
 import { RPC } from '../lib/zkswap/rpc'
 import { AMM } from '../lib/zkswap/amm'
 import { TwistedElGamal } from '../lib/zkswap/twistedElGamal'
-import { Equality } from '../lib/zkswap/zk'
+import { PerdesenEquality, ProductConstant } from '../lib/zk'
 
 const supply = 1_000_000_000n
 const deposit = 100_000_000n
@@ -90,14 +90,14 @@ describe('amm & oracle', function () {
   //   const srcAmountB = new TwistedElGamal(deposit, accountB.s, accountB.z)
   //   const dstAmountB = new TwistedElGamal(deposit, treasuryB.s, treasuryB.z)
 
-  //   const equalityProofA = Equality.prove(
+  //   const equalityProofA = PerdesenEquality.prove(
   //     deposit,
   //     accountA.z,
   //     treasuryA.z,
   //     srcAmountA.C,
   //     dstAmountA.C,
   //   )
-  //   const equalityProofB = Equality.prove(
+  //   const equalityProofB = PerdesenEquality.prove(
   //     deposit,
   //     accountB.z,
   //     treasuryB.z,
@@ -133,14 +133,14 @@ describe('amm & oracle', function () {
   //   const srcAmounntB = new TwistedElGamal(deposit, treasuryB.s, treasuryB.z)
   //   const dstAmounntB = new TwistedElGamal(deposit, accountB.s, accountB.z)
 
-  //   const equalityProofA = Equality.prove(
+  //   const equalityProofA = PerdesenEquality.prove(
   //     deposit,
   //     treasuryA.z,
   //     accountA.z,
   //     srcAmounntA.C,
   //     dstAmounntA.C,
   //   )
-  //   const equalityProofB = Equality.prove(
+  //   const equalityProofB = PerdesenEquality.prove(
   //     deposit,
   //     treasuryB.z,
   //     accountB.z,
@@ -171,7 +171,14 @@ describe('amm & oracle', function () {
     const accountB = ledger.getAccount(accountBPublicKey)
     const { treasuryA, treasuryB } = amm.getTreasuries()
 
-    const proof = oracle.swapAB(
+    const {
+      srcBidAmount,
+      dstAskAmount,
+      bidAdjustment,
+      askAdjustment,
+      equalityBidProof,
+      equalityAskProof,
+    } = oracle.swapAB(
       gamma,
       accountAPublicKey,
       accountBPublicKey,
@@ -179,46 +186,36 @@ describe('amm & oracle', function () {
       amm.treasuryBPublicKey,
     )
 
-    // const srcAmountA = new TwistedElGamal(amount, accountA.s, accountA.z)
-    // const dstAmountA = new TwistedElGamal(amount, treasuryA.s, treasuryA.z)
-    // const srcAmountB = new TwistedElGamal(amount, treasuryB.s, treasuryB.z)
-    // const dstAmountB = new TwistedElGamal(amount, accountB.s, accountB.z)
+    const dstBidAmount = ProductConstant.computeDstBidAmount(
+      gamma,
+      treasuryA.amount,
+      bidAdjustment,
+    )
+    const srcAskAmount = ProductConstant.computeSrcAskAmount(
+      gamma,
+      treasuryB.amount,
+      askAdjustment,
+    )
 
-    // const equalityProofA = Equality.prove(
-    //   amount,
-    //   accountA.z,
-    //   treasuryA.z,
-    //   srcAmountA.C,
-    //   dstAmountA.C,
-    // )
-    // const equalityProofB = Equality.prove(
-    //   amount,
-    //   treasuryB.z,
-    //   accountB.z,
-    //   srcAmountB.C,
-    //   dstAmountB.C,
-    // )
+    amm.swapAB(
+      gamma,
 
-    // amm.swapAB(
-    //   200_000n,
+      accountAPublicKey,
+      srcBidAmount,
+      dstBidAmount,
+      equalityBidProof,
 
-    //   accountAPublicKey,
-    //   srcAmountA,
-    //   dstAmountA,
-    //   equalityProofA,
+      accountBPublicKey,
+      srcAskAmount,
+      dstAskAmount,
+      equalityAskProof,
+    )
+    const ok =
+      accountA.amount.verify(supply - deposit - 20004n, accountA.s) &&
+      accountB.amount.verify(supply - deposit + 20000n, accountB.s) &&
+      treasuryA.amount.verify(deposit + 20004n, treasuryA.s) &&
+      treasuryB.amount.verify(deposit - 20000n, treasuryB.s)
 
-    //   accountBPublicKey,
-    //   srcAmountB,
-    //   dstAmountB,
-    //   equalityProofB,
-    // )
-
-    // const ok =
-    //   accountA.amount.verify(supply - deposit - amount, accountA.s) &&
-    //   accountB.amount.verify(supply - deposit + amount, accountB.s) &&
-    //   treasuryA.amount.verify(deposit + amount, treasuryA.s) &&
-    //   treasuryB.amount.verify(deposit - amount, treasuryB.s)
-
-    // expect(ok).true
+    expect(ok).true
   })
 })
