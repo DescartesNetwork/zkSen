@@ -5,7 +5,7 @@ import { Oracle } from '../lib/zkswap/oracle'
 import { RPC } from '../lib/zkswap/rpc'
 import { AMM } from '../lib/zkswap/amm'
 import { TwistedElGamal } from '../lib/twistedElGamal'
-import { Deposit, ProductConstant } from '../lib/zk'
+import { Deposit, ProductConstant } from '../lib/nizk'
 
 const supply = 1_000_000_000n
 const deposit = 100_000_000n

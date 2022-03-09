@@ -1,6 +1,6 @@
 import { Point } from 'point'
 import { mod, randScalar } from 'utils'
-import { noninteractive } from 'zk/fiatShamirHeuristic'
+import { noninteractive } from 'nizk/fiatShamirHeuristic'
 
 /**
  * Perdesen Equality Proof

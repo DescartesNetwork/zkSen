@@ -7,7 +7,7 @@ import {
   ScalarMultiplication,
   HybridEquality,
   SquareRoot,
-} from '../lib/zk'
+} from '../lib/nizk'
 
 describe('zk', function () {
   it('scalar multiplication proof', () => {

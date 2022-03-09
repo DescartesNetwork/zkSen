@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { ProductConstant, ProductConstantProof } from 'zk'
+import { ProductConstant, ProductConstantProof } from 'nizk'
 import { RPC } from './rpc'
 import { AMM, AMMEvents } from './amm'
 import { LedgerActions } from './ledger'

@@ -12,7 +12,7 @@ import {
   ScalarMultiplication,
   HybridEquality,
   HybridEqualityProof,
-} from 'zk'
+} from 'nizk'
 
 export enum AMMEvents {
   Init = 'amm/event/init',
