@@ -28,18 +28,12 @@ export const padding = (bin: string, bits: number = 64) => {
   return re
 }
 
-declare global {
-  interface BigInt {
-    sqrt(): bigint
-  }
-}
-
-BigInt.prototype.sqrt = function () {
-  const self = this.valueOf()
+export const sqrt = (a: bigint): bigint => {
+  const self = a.valueOf()
   const one = BigInt(1)
   const two = BigInt(2)
   if (self < two) return self
-  let bits = BigInt(this.toString(2).length + 1) / two
+  let bits = BigInt(a.toString(2).length + 1) / two
   let start = one << (bits - one)
   let end = one << (bits + one)
   while (start < end) {

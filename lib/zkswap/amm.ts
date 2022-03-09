@@ -5,11 +5,14 @@ import { Account } from './ledger/spl'
 import { RPC } from './rpc'
 import { TwistedElGamal } from './twistedElgamal'
 import {
+  Deposit,
+  DepositProof,
   PerdesenEquality,
   PerdesenEqualityProof,
   ScalarMultiplication,
-} from '../zk'
-import { HybridEquality, HybridEqualityProof } from 'zk/hybridEquality'
+  HybridEquality,
+  HybridEqualityProof,
+} from 'zk'
 
 export enum AMMEvents {
   Init = 'amm/event/init',
@@ -156,19 +159,14 @@ export class AMM {
 
   deposit = (
     srcAPublicKey: PublicKey,
-    srcAmountA: TwistedElGamal,
-    dstAmountA: TwistedElGamal,
-    equalityProofA: PerdesenEqualityProof,
-
     srcBPublicKey: PublicKey,
-    srcAmountB: TwistedElGamal,
-    dstAmountB: TwistedElGamal,
-    equalityProofB: PerdesenEqualityProof,
+    depositProof: DepositProof,
   ) => {
-    if (!PerdesenEquality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
-      throw new Error('Invalid proof of amount A')
-    if (!PerdesenEquality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
-      throw new Error('Invalid proof of amount B')
+    if (!Deposit.verify(depositProof))
+      throw new Error('Invalid proof of deposit')
+
+    const { srcAmountA, dstAmountA, srcAmountB, dstAmountB } = depositProof
+
     this.rpc.emit(
       LedgerActions.Transfer,
       srcAmountA,
@@ -185,6 +183,7 @@ export class AMM {
       this.treasuryBPublicKey,
       this.mintBPublicKey,
     )
+    this.rpc.emit(AMMEvents.Deposit)
   }
 
   withdraw = (
@@ -202,6 +201,7 @@ export class AMM {
       throw new Error('Invalid proof of amount A')
     if (!PerdesenEquality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
       throw new Error('Invalid proof of amount B')
+
     this.rpc.emit(
       LedgerActions.Transfer,
       srcAmountA,
@@ -237,6 +237,7 @@ export class AMM {
       throw new Error('Invalid proof of amount A')
     if (!HybridEquality.verify(srcAmountB, dstAmountB, equalityProofB))
       throw new Error('Invalid proof of amount B')
+
     this.rpc.emit(
       LedgerActions.Transfer,
       srcAmountA,
@@ -253,6 +254,7 @@ export class AMM {
       dstPublicKey,
       this.mintBPublicKey,
     )
+
     this.rpc.emit(
       AMMEvents.SwapAB,
       gamma,
@@ -282,6 +284,7 @@ export class AMM {
       throw new Error('Invalid proof of amount B')
     if (!HybridEquality.verify(srcAmountA, dstAmountA, equalityProofA))
       throw new Error('Invalid proof of amount A')
+
     this.rpc.emit(
       LedgerActions.Transfer,
       srcAmountB,
@@ -298,6 +301,7 @@ export class AMM {
       dstPublicKey,
       this.mintAPublicKey,
     )
+
     this.rpc.emit(
       AMMEvents.SwapBA,
       gamma,

@@ -5,7 +5,7 @@ import { Oracle } from '../lib/zkswap/oracle'
 import { RPC } from '../lib/zkswap/rpc'
 import { AMM } from '../lib/zkswap/amm'
 import { TwistedElGamal } from '../lib/zkswap/twistedElGamal'
-import { PerdesenEquality, ProductConstant } from '../lib/zk'
+import { Deposit, PerdesenEquality, ProductConstant } from '../lib/zk'
 
 const supply = 1_000_000_000n
 const deposit = 100_000_000n
@@ -80,48 +80,32 @@ describe('amm & oracle', function () {
     expect(ok).true
   })
 
-  // it('deposit', () => {
-  //   const accountA = ledger.getAccount(accountAPublicKey)
-  //   const accountB = ledger.getAccount(accountBPublicKey)
-  //   const { treasuryA, treasuryB } = amm.getTreasuries()
+  it('deposit', () => {
+    const accountA = ledger.getAccount(accountAPublicKey)
+    const accountB = ledger.getAccount(accountBPublicKey)
+    const accountLP = ledger.getAccount(accountLPPublicKey)
+    const { treasuryA, treasuryB } = amm.getTreasuries()
 
-  //   const srcAmountA = new TwistedElGamal(deposit, accountA.s, accountA.z)
-  //   const dstAmountA = new TwistedElGamal(deposit, treasuryA.s, treasuryA.z)
-  //   const srcAmountB = new TwistedElGamal(deposit, accountB.s, accountB.z)
-  //   const dstAmountB = new TwistedElGamal(deposit, treasuryB.s, treasuryB.z)
+    const depositProof = Deposit.prove(
+      deposit,
+      deposit,
+      accountA,
+      accountB,
+      accountLP,
+      treasuryA.amount.P,
+      treasuryB.amount.P,
+      accountLP.amount.P,
+    )
 
-  //   const equalityProofA = PerdesenEquality.prove(
-  //     deposit,
-  //     accountA.z,
-  //     treasuryA.z,
-  //     srcAmountA.C,
-  //     dstAmountA.C,
-  //   )
-  //   const equalityProofB = PerdesenEquality.prove(
-  //     deposit,
-  //     accountB.z,
-  //     treasuryB.z,
-  //     srcAmountB.C,
-  //     dstAmountB.C,
-  //   )
-  //   amm.deposit(
-  //     accountAPublicKey,
-  //     srcAmountA,
-  //     dstAmountA,
-  //     equalityProofA,
-  //     accountBPublicKey,
-  //     srcAmountB,
-  //     dstAmountB,
-  //     equalityProofB,
-  //   )
-  //   // Including the deposit amount of init
-  //   const ok =
-  //     accountA.amount.verify(supply - 2n * deposit, accountA.s) &&
-  //     accountB.amount.verify(supply - 2n * deposit, accountB.s) &&
-  //     treasuryA.amount.verify(2n * deposit, treasuryA.s) &&
-  //     treasuryB.amount.verify(2n * deposit, treasuryB.s)
-  //   expect(ok).true
-  // })
+    amm.deposit(accountAPublicKey, accountBPublicKey, depositProof)
+    // Including the deposit amount of init
+    const ok =
+      accountA.amount.verify(supply - 2n * deposit, accountA.s) &&
+      accountB.amount.verify(supply - 2n * deposit, accountB.s) &&
+      treasuryA.amount.verify(2n * deposit, treasuryA.s) &&
+      treasuryB.amount.verify(2n * deposit, treasuryB.s)
+    expect(ok).true
+  })
 
   // it('withdraw', () => {
   //   const accountA = ledger.getAccount(accountAPublicKey)
