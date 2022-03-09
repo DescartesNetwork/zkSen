@@ -18,6 +18,7 @@ export class Oracle {
   }
 
   start = () => {
+    // Init listener
     this.rpc.on(
       AMMEvents.Init,
       (
@@ -33,6 +34,7 @@ export class Oracle {
         console.log(AMMEvents.Init, this.ra, this.rb)
       },
     )
+    // Swap A to B listener
     this.rpc.on(
       AMMEvents.SwapAB,
       (
@@ -53,6 +55,28 @@ export class Oracle {
         console.log(AMMEvents.SwapAB, this.ra, this.rb)
       },
     )
+    // Swap B to A listener
+    this.rpc.on(
+      AMMEvents.SwapBA,
+      (
+        gamma,
+        srcPublicKey,
+        dstPublicKey,
+        srcAmountA,
+        dstAmountA,
+        srcAmountB,
+        dstAmountB,
+      ) => {
+        const bidAdjustmentAmount =
+          this.rb * AMM.PRECISION - ((this.rb * AMM.PRECISION) / gamma) * gamma
+        this.rb = (this.rb * AMM.PRECISION - bidAdjustmentAmount) / gamma
+        const askAdjustmentAmount =
+          this.ra * gamma - ((this.ra * gamma) / AMM.PRECISION) * AMM.PRECISION
+        this.ra = (this.ra * gamma - askAdjustmentAmount) / AMM.PRECISION
+        console.log(AMMEvents.SwapAB, this.ra, this.rb)
+      },
+    )
+    // Deposit listener
     this.rpc.on(
       AMMEvents.Deposit,
       (
@@ -82,6 +106,38 @@ export class Oracle {
         this.ra += a
         this.rb += b
         console.log(AMMEvents.Deposit, this.ra, this.rb)
+      },
+    )
+    // Withdraw listener
+    this.rpc.on(
+      AMMEvents.Withdraw,
+      (
+        srcAPublicKey: PublicKey,
+        dstAPublicKey,
+        srcBPublicKey: PublicKey,
+        dstBPublicKey,
+        srcLPPublicKey,
+        srcAmountA,
+        dstAmountA: TwistedElGamal,
+        srcAmountB,
+        dstAmountB: TwistedElGamal,
+        srcAmountLP,
+        dstAmountLP,
+      ) => {
+        const treasuryA = this.rpc.emit<Account>(
+          LedgerActions.GetAccount,
+          srcAPublicKey,
+        )
+        const treasuryB = this.rpc.emit<Account>(
+          LedgerActions.GetAccount,
+          srcBPublicKey,
+        )
+        const a = srcAmountA.solve(treasuryA.s)
+        const b = srcAmountB.solve(treasuryB.s)
+        if (!a || !b) throw new Error('Cannot solve the discrete log problem')
+        this.ra -= a
+        this.rb -= b
+        console.log(AMMEvents.Withdraw, this.ra, this.rb)
       },
     )
   }

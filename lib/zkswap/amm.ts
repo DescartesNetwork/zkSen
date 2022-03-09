@@ -12,6 +12,8 @@ import {
   ScalarMultiplication,
   HybridEquality,
   HybridEqualityProof,
+  WithdrawProof,
+  Withdraw,
 } from 'nizk'
 
 export enum AMMEvents {
@@ -191,10 +193,6 @@ export class AMM {
       this.treasuryBPublicKey,
       this.mintBPublicKey,
     )
-    // this.rpc.emit(
-    //   LedgerActions.Burn,
-
-    // )
 
     this.rpc.emit(
       AMMEvents.Deposit,
@@ -214,19 +212,21 @@ export class AMM {
 
   withdraw = (
     dstAPublicKey: PublicKey,
-    srcAmountA: TwistedElGamal,
-    dstAmountA: TwistedElGamal,
-    equalityProofA: PerdesenEqualityProof,
-
     dstBPublicKey: PublicKey,
-    srcAmountB: TwistedElGamal,
-    dstAmountB: TwistedElGamal,
-    equalityProofB: PerdesenEqualityProof,
+    srcLPPublicKey: PublicKey,
+    withdrawProof: WithdrawProof,
   ) => {
-    if (!PerdesenEquality.verify(srcAmountA.C, dstAmountA.C, equalityProofA))
-      throw new Error('Invalid proof of amount A')
-    if (!PerdesenEquality.verify(srcAmountB.C, dstAmountB.C, equalityProofB))
-      throw new Error('Invalid proof of amount B')
+    if (!Withdraw.verify(withdrawProof))
+      throw new Error('Invalid proof of withdraw')
+
+    const {
+      srcAmountA,
+      dstAmountA,
+      srcAmountB,
+      dstAmountB,
+      srcAmountLP,
+      dstAmountLP,
+    } = withdrawProof
 
     this.rpc.emit(
       LedgerActions.Transfer,
@@ -243,6 +243,21 @@ export class AMM {
       this.treasuryBPublicKey,
       dstBPublicKey,
       this.mintBPublicKey,
+    )
+
+    this.rpc.emit(
+      AMMEvents.Withdraw,
+      this.treasuryAPublicKey,
+      dstAPublicKey,
+      this.treasuryBPublicKey,
+      dstBPublicKey,
+      srcLPPublicKey,
+      srcAmountA,
+      dstAmountA,
+      srcAmountB,
+      dstAmountB,
+      srcAmountLP,
+      dstAmountLP,
     )
   }
 
