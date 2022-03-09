@@ -4,6 +4,7 @@ import { RPC } from './rpc'
 import { AMM, AMMEvents } from './amm'
 import { LedgerActions } from './ledger'
 import { Account } from './ledger/spl'
+import { TwistedElGamal } from 'twistedElGamal'
 
 export class Oracle {
   private rpc: RPC
@@ -50,6 +51,37 @@ export class Oracle {
           this.rb * gamma - ((this.rb * gamma) / AMM.PRECISION) * AMM.PRECISION
         this.rb = (this.rb * gamma - askAdjustmentAmount) / AMM.PRECISION
         console.log(AMMEvents.SwapAB, this.ra, this.rb)
+      },
+    )
+    this.rpc.on(
+      AMMEvents.Deposit,
+      (
+        srcAPublicKey,
+        dstAPublicKey: PublicKey,
+        srcBPublicKey,
+        dstBPublicKey: PublicKey,
+        dstLPPublicKey,
+        srcAmountA,
+        dstAmountA: TwistedElGamal,
+        srcAmountB,
+        dstAmountB: TwistedElGamal,
+        srcAmountLP,
+        dstAmountLP,
+      ) => {
+        const treasuryA = this.rpc.emit<Account>(
+          LedgerActions.GetAccount,
+          dstAPublicKey,
+        )
+        const treasuryB = this.rpc.emit<Account>(
+          LedgerActions.GetAccount,
+          dstBPublicKey,
+        )
+        const a = dstAmountA.solve(treasuryA.s)
+        const b = dstAmountB.solve(treasuryB.s)
+        if (!a || !b) throw new Error('Cannot solve the discrete log problem')
+        this.ra += a
+        this.rb += b
+        console.log(AMMEvents.Deposit, this.ra, this.rb)
       },
     )
   }

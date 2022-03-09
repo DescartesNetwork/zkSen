@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
+import { TwistedElGamal } from 'twistedElGamal'
 import { Mint } from './spl'
 import { RPC } from '../rpc'
-import { TwistedElGamal } from '../twistedElGamal'
 
 export const LedgerPing = 'ledger/ping'
 

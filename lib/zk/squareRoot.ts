@@ -1,5 +1,5 @@
 import { mod } from 'utils'
-import { TwistedElGamal } from 'zkswap/twistedElgamal'
+import { TwistedElGamal } from 'twistedElGamal'
 import { Multiplication, MultiplicationProof } from './multiplication'
 import { PerdesenEquality, PerdesenEqualityProof } from './perdesenEquality'
 

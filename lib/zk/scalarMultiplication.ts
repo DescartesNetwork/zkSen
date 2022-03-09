@@ -1,4 +1,4 @@
-import { TwistedElGamal } from 'zkswap/twistedElgamal'
+import { TwistedElGamal } from 'twistedElGamal'
 
 /**
  * Scalar Multiplication Proof

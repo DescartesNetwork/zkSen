@@ -1,6 +1,6 @@
 import { Point } from 'point'
 import { invert, randScalar } from 'utils'
-import { TwistedElGamal } from 'zkswap/twistedElgamal'
+import { TwistedElGamal } from 'twistedElGamal'
 import { Account } from 'zkswap/ledger/spl'
 import { AMM } from 'zkswap/amm'
 import { HybridEquality, HybridEqualityProof } from './hybridEquality'

@@ -1,6 +1,6 @@
 import { Keypair, PublicKey } from '@solana/web3.js'
-import { randScalar } from '../../utils'
-import { TwistedElGamal } from '../twistedElgamal'
+import { randScalar } from 'utils'
+import { TwistedElGamal } from 'twistedElGamal'
 
 export class Account {
   public publicKey: PublicKey

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { TwistedElGamal } from '../lib/zkswap/twistedElGamal'
+import { TwistedElGamal } from '../lib/twistedElGamal'
 import { mod, randScalar } from '../lib/utils'
 
 const m = randScalar()

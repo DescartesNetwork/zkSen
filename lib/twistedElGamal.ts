@@ -1,5 +1,8 @@
-import { Point } from '../point'
-import { invert, randScalar } from '../utils'
+import { Point } from 'point'
+import { invert, randScalar } from 'utils'
+
+const MAX_STEPS = 10000
+const STEP = 100_000n
 
 export class TwistedElGamal {
   public C: Point // Commiment
@@ -36,6 +39,14 @@ export class TwistedElGamal {
     const dC = this.C.subtract(this.D.multiply(s))
     const _dC = Point.G.multiply(m)
     return dC.equals(_dC)
+  }
+
+  solve = (s: bigint): bigint | undefined => {
+    for (let i = 0; i < MAX_STEPS; i++) {
+      const m = BigInt(i) * STEP
+      if (this.verify(m, s)) return m
+    }
+    return undefined
   }
 
   identify = (other: TwistedElGamal) => {

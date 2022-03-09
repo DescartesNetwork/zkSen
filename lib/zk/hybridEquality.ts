@@ -1,6 +1,6 @@
 import { Point } from 'point'
 import { mod, randScalar } from 'utils'
-import { TwistedElGamal } from 'zkswap/twistedElgamal'
+import { TwistedElGamal } from 'twistedElGamal'
 import { noninteractive } from './fiatShamirHeuristic'
 
 /**

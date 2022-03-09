@@ -4,8 +4,8 @@ import { Ledger } from '../lib/zkswap/ledger'
 import { Oracle } from '../lib/zkswap/oracle'
 import { RPC } from '../lib/zkswap/rpc'
 import { AMM } from '../lib/zkswap/amm'
-import { TwistedElGamal } from '../lib/zkswap/twistedElGamal'
-import { Deposit, PerdesenEquality, ProductConstant } from '../lib/zk'
+import { TwistedElGamal } from '../lib/twistedElGamal'
+import { Deposit, ProductConstant } from '../lib/zk'
 
 const supply = 1_000_000_000n
 const deposit = 100_000_000n
@@ -97,7 +97,12 @@ describe('amm & oracle', function () {
       accountLP.amount.P,
     )
 
-    amm.deposit(accountAPublicKey, accountBPublicKey, depositProof)
+    amm.deposit(
+      accountAPublicKey,
+      accountBPublicKey,
+      accountLPPublicKey,
+      depositProof,
+    )
     // Including the deposit amount of init
     const ok =
       accountA.amount.verify(supply - 2n * deposit, accountA.s) &&

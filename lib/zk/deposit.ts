@@ -1,7 +1,7 @@
 import { Point } from 'point'
 import { mod, randScalar, sqrt } from 'utils'
 import { Account } from 'zkswap/ledger/spl'
-import { TwistedElGamal } from 'zkswap/twistedElgamal'
+import { TwistedElGamal } from 'twistedElGamal'
 import { HybridEquality, HybridEqualityProof } from './hybridEquality'
 import { SquareRoot, SquareRootProof } from './squareRoot'
 

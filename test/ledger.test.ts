@@ -1,9 +1,9 @@
 import { expect } from 'chai'
-import { LedgerActions, Ledger } from '../lib/zkswap/ledger'
 import { PublicKey } from '@solana/web3.js'
+import { LedgerActions, Ledger } from '../lib/zkswap/ledger'
 import { RPC } from '../lib/zkswap/rpc'
 import { Account, Mint } from '../lib/zkswap/ledger/spl'
-import { TwistedElGamal } from '../lib/zkswap/twistedElGamal'
+import { TwistedElGamal } from '../lib/twistedElGamal'
 
 const supply = 1_000_000_000n
 const amount = 1_000_000n

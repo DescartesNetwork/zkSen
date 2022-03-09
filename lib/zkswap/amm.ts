@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
-import { invert, mod } from '../utils'
+import { invert, mod } from 'utils'
+import { TwistedElGamal } from 'twistedElGamal'
 import { LedgerActions, LedgerPing } from './ledger'
 import { Account } from './ledger/spl'
 import { RPC } from './rpc'
-import { TwistedElGamal } from './twistedElgamal'
 import {
   Deposit,
   DepositProof,
@@ -160,12 +160,20 @@ export class AMM {
   deposit = (
     srcAPublicKey: PublicKey,
     srcBPublicKey: PublicKey,
+    dstLPPublicKey: PublicKey,
     depositProof: DepositProof,
   ) => {
     if (!Deposit.verify(depositProof))
       throw new Error('Invalid proof of deposit')
 
-    const { srcAmountA, dstAmountA, srcAmountB, dstAmountB } = depositProof
+    const {
+      srcAmountA,
+      dstAmountA,
+      srcAmountB,
+      dstAmountB,
+      srcAmountLP,
+      dstAmountLP,
+    } = depositProof
 
     this.rpc.emit(
       LedgerActions.Transfer,
@@ -183,7 +191,25 @@ export class AMM {
       this.treasuryBPublicKey,
       this.mintBPublicKey,
     )
-    this.rpc.emit(AMMEvents.Deposit)
+    // this.rpc.emit(
+    //   LedgerActions.Burn,
+
+    // )
+
+    this.rpc.emit(
+      AMMEvents.Deposit,
+      srcAPublicKey,
+      this.treasuryAPublicKey,
+      srcBPublicKey,
+      this.treasuryBPublicKey,
+      dstLPPublicKey,
+      srcAmountA,
+      dstAmountA,
+      srcAmountB,
+      dstAmountB,
+      srcAmountLP,
+      dstAmountLP,
+    )
   }
 
   withdraw = (

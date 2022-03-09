@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { mod, randScalar } from '../lib/utils'
-import { TwistedElGamal } from '../lib/zkswap/twistedElgamal'
+import { TwistedElGamal } from '../lib/twistedElGamal'
 import {
   Multiplication,
   PerdesenEquality,
