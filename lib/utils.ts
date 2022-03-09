@@ -27,3 +27,24 @@ export const padding = (bin: string, bits: number = 64) => {
   while (re.length < bits) re = '0' + re
   return re
 }
+
+declare global {
+  interface BigInt {
+    sqrt(): bigint
+  }
+}
+
+BigInt.prototype.sqrt = function () {
+  const self = this.valueOf()
+  const one = BigInt(1)
+  const two = BigInt(2)
+  if (self < two) return self
+  let bits = BigInt(this.toString(2).length + 1) / two
+  let start = one << (bits - one)
+  let end = one << (bits + one)
+  while (start < end) {
+    end = (start + end) / two
+    start = self / end
+  }
+  return end
+}
