@@ -12,8 +12,8 @@ import {
   ScalarMultiplication,
   HybridEquality,
   HybridEqualityProof,
-  WithdrawProof,
-  Withdraw,
+  WithdrawalProof,
+  Withdrawal,
 } from 'nizk'
 
 export enum AMMEvents {
@@ -214,9 +214,9 @@ export class AMM {
     dstAPublicKey: PublicKey,
     dstBPublicKey: PublicKey,
     srcLPPublicKey: PublicKey,
-    withdrawProof: WithdrawProof,
+    withdrawProof: WithdrawalProof,
   ) => {
-    if (!Withdraw.verify(withdrawProof))
+    if (!Withdrawal.verify(withdrawProof))
       throw new Error('Invalid proof of withdraw')
 
     const {

@@ -6,7 +6,7 @@ import { HybridEquality, HybridEqualityProof } from './hybridEquality'
 import { SquareRoot, SquareRootProof } from './squareRoot'
 
 /**
- * Withdraw Proof
+ * Withdrawal Proof
  *
  * SR = SquareRoot(dstAmountA, dstAmountB, dstAmountLP, Q1, Q2, a, r1, b, r2, lp, r3)
  * HE1 = HybridEquality(dstAmountA, srcAmountA)
@@ -14,7 +14,7 @@ import { SquareRoot, SquareRootProof } from './squareRoot'
  * HE3 = HybridEquality(srcAmountLP, dstAmountLP)
  */
 
-export type WithdrawProof = {
+export type WithdrawalProof = {
   srcAmountA: TwistedElGamal
   srcAmountB: TwistedElGamal
   srcAmountLP: TwistedElGamal
@@ -29,7 +29,7 @@ export type WithdrawProof = {
   HE3: HybridEqualityProof
 }
 
-export const Withdraw = {
+export const Withdrawal = {
   prove: (
     a: bigint,
     b: bigint,
@@ -111,7 +111,7 @@ export const Withdraw = {
       HE3,
     }
   },
-  verify: (proof: WithdrawProof) => {
+  verify: (proof: WithdrawalProof) => {
     let ok = true
     const {
       srcAmountA,
