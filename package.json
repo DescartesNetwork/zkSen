@@ -4,7 +4,8 @@
   "description": "Implementation of Bulletproof for ZK SPL Token",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.ts",
+    "start": "node -r tsconfig-paths/register -r ts-node/register index.ts",
+    "hashmap": "ts-node hashmap.ts",
     "build": "npm run clean && tsc",
     "clean": "rm -rf ./dist",
     "predeploy": "typedoc --excludePrivate --excludeProtected index.ts",
@@ -44,6 +45,7 @@
     "@solana/web3.js": "^1.36.0",
     "@types/chai": "^4.3.0",
     "bn.js": "^5.2.0",
+    "csv-parse": "^5.0.4",
     "events": "^3.3.0",
     "tweetnacl": "^1.0.3"
   }

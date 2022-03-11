@@ -10,11 +10,13 @@ export class Oracle {
   private rpc: RPC
   private ra: bigint
   private rb: bigint
+  private lp: bigint
 
   constructor(rpc: RPC) {
     this.rpc = rpc
     this.ra = 0n
     this.rb = 0n
+    this.lp = 0n
   }
 
   start = () => {
@@ -31,6 +33,7 @@ export class Oracle {
       ) => {
         this.ra = amountA
         this.rb = amountB
+        this.lp = amountLP
         console.log(AMMEvents.Init, this.ra, this.rb)
       },
     )
