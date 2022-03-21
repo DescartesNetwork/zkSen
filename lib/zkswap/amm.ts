@@ -7,8 +7,6 @@ import { RPC } from './rpc'
 import {
   Deposit,
   DepositProof,
-  PerdesenEquality,
-  PerdesenEqualityProof,
   ScalarMultiplication,
   HybridEquality,
   HybridEqualityProof,

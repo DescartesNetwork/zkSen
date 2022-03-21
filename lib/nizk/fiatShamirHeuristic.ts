@@ -4,11 +4,11 @@ import { hash } from 'tweetnacl'
 
 /**
  * Fiat-Shamir heuristic
- * @param agrs
+ * @param args
  * @returns
  */
-export const noninteractive = (...agrs: Point[]): bigint => {
-  const seed = agrs.reduce(
+export const noninteractive = (...args: Point[]): bigint => {
+  const seed = args.reduce(
     (prev, cur) => new Uint8Array([...prev, ...cur.toRawBytes()]),
     new Uint8Array([]),
   )

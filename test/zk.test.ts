@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { mod, randScalar } from '../lib/utils'
+import { mod, randPoint, randScalar } from '../lib/utils'
 import { TwistedElGamal } from '../lib/twistedElGamal'
 import {
   Multiplication,
@@ -7,7 +7,10 @@ import {
   ScalarMultiplication,
   HybridEquality,
   SquareRoot,
+  ShuffleCommitment,
+  Shuffle,
 } from '../lib/nizk'
+import { Point } from '../lib/point'
 
 describe('zk', function () {
   it('scalar multiplication proof', () => {
@@ -67,6 +70,19 @@ describe('zk', function () {
     const Q2 = new TwistedElGamal(mod(c * c), randScalar(), mod(c * r3))
     const proof = SquareRoot.prove(A, B, C, Q1, Q2, a, r1, b, r2, c, r3)
     const ok = SquareRoot.verify(A, B, C, Q1, Q2, proof)
+    expect(ok).true
+  })
+
+  it('shuffle', () => {
+    const gamma = randScalar()
+    const A = randPoint()
+    const B = randPoint()
+    const C = Point.G.multiply(gamma)
+    const C1 = A.multiply(gamma)
+    const C2 = B.multiply(gamma)
+    const commitment: ShuffleCommitment = { A, B, C, C1, C2 }
+    const zpk = Shuffle.prove(commitment, gamma)
+    const ok = Shuffle.verify(commitment, zpk)
     expect(ok).true
   })
 })
