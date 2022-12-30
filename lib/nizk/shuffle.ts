@@ -67,8 +67,8 @@ export const ChaumPedersen = {
  * Prover:
  * r1 = Hash(A, B, C, C1, C2, G)
  * r2 = Hash(A, B, C, C1, C2, 2G)
- * Chaum-Pedersen Proof: CPP1 = PK ( γ ) {G, A+B, C, C1+C2}
- * Chaum-Pedersen Proof: CPP2 = PK ( γ ) {G, r1A+r2B, C, r2C1+r2C2}
+ * Chaum-Pedersen Proof: CPP1 = PK ( γ ) { G, A+B, C, C1+C2 }
+ * Chaum-Pedersen Proof: CPP2 = PK ( γ ) { G, r1A+r2B, C, r2C1+r2C2 }
  *
  * Verifier:
  * Chaum-Pedersen Verifier { CPP1 } && Chaum-Pedersen Verifier { CPP2 }
@@ -100,7 +100,7 @@ export const Shuffle = {
     const r1 = noninteractive(A, B, C, C1, C2, Point.G.multiply(1n))
     const r2 = noninteractive(A, B, C, C1, C2, Point.G.multiply(2n))
 
-    // PK ( γ ) { G, A+B, γG, γ(A+B)}
+    // PK ( γ ) { G, A+B, γG, γ(A+B) }
     const commiment1: ChaumPedersenCommitment = {
       G: Point.G,
       H: A.add(B),
@@ -108,7 +108,7 @@ export const Shuffle = {
       C2: C1.add(C2),
     }
     const CPP1 = ChaumPedersen.prove(commiment1, gamma)
-    // PK ( γ ) { G, r1A+r2B, γG, γ(r1A+r2B)}
+    // PK ( γ ) { G, r1A+r2B, γG, γ(r1A+r2B) }
     const commiment2: ChaumPedersenCommitment = {
       G: Point.G,
       H: A.multiply(r1).add(B.multiply(r2)),
